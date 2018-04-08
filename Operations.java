@@ -111,16 +111,16 @@ class Operations
 
   public void showClients()
   {
-    String leftAlignFormat = "| %-6d | %-10s | %-21s | %-27s | %-11s | %-25.2f |%n";
+    String leftAlignFormat = "| %-6d | %-10s | %-21s | %-11s | %-27s | %-25.2f |%n";
     System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
     System.out.format("|   ID   | First Name |       Last Name       |    Pesel    |           Address           |          Balance          |%n");
     System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
     accounts.forEach(client ->
     {
       System.out.format(leftAlignFormat, client.getId(), client.getFirstName(), client.getLastName(), client.getPesel(), client.getAddress(), client.getBalance());
+      System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
     }
     );
-    System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
   }
 
 }

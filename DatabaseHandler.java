@@ -39,7 +39,7 @@ class DatabaseHandler
 
     database = new File(loaclDatabaseName);
 
-    if(database.exists() && !database.isDirectory())
+    if(database.exists() && !database.isDirectory() && database.length() != 0)
     {
       try
       {
