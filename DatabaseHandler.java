@@ -19,7 +19,7 @@ class DatabaseHandler
 {
   private List<Client> clients = null;
   private File database = null;
-  private String loaclDatabaseName;
+  private String loaclDatabaseName = "";
 
   DatabaseHandler(String databaseFileName, List<Client> clientList)
   {
@@ -48,7 +48,6 @@ class DatabaseHandler
         Document doc = dBuilder.parse(database);
 
         doc.getDocumentElement().normalize();
-  	    //System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 
   	    NodeList nList = doc.getElementsByTagName("client");
 

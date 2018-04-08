@@ -12,23 +12,23 @@ class Bank
       usage();
       System.exit(1);
     }
-
     DatabaseHandler bankDatabase = new DatabaseHandler(args[0], clients);
-
-    clients.forEach(client ->
-    {
-      System.out.println(client.getId());
-      System.out.println(client.getFirstName());
-      System.out.println(client.getLastName());
-      System.out.println(client.getAddress());
-      System.out.println(client.getPesel());
-      System.out.println(client.getBalance());
-    }
-    );
-
-    clients.add(new Client(1, "XD", "XD", "XD", "XD", 12.0));
-
-    bankDatabase.saveDatabase();
+    Menu mainMenu = new Menu(bankDatabase, clients);
+    // clients.forEach(client ->
+    // {
+    //   System.out.println(client.getId());
+    //   System.out.println(client.getFirstName());
+    //   System.out.println(client.getLastName());
+    //   System.out.println(client.getAddress());
+    //   System.out.println(client.getPesel());
+    //   System.out.println(client.getBalance());
+    // }
+    // );
+    //
+    // clients.add(new Client(1, "XD", "XD", "XD", "XD", 12.0));
+    //
+    // bankDatabase.saveDatabase();
+    System.exit(0);
   }
 
   public static void usage()
