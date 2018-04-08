@@ -23,7 +23,8 @@ class Menu
       System.out.print("> ");
       switch (userInput.nextLine()) {
         case "a":
-          System.out.println("a");
+          bankOperations.addClient();
+          // System.out.println("a");
           break;
         case "e":
           System.out.println("e");

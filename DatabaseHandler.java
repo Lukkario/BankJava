@@ -70,6 +70,7 @@ class DatabaseHandler
       catch(Exception e)
       {
         System.out.println("Error occured while loading database.");
+        System.exit(2);
       }
     }
     else
