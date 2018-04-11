@@ -69,7 +69,7 @@ class DatabaseHandler
       }
       catch(Exception e)
       {
-        System.out.println("Error occured while loading database.");
+        System.out.println("[!] Error occured while loading database.");
         System.exit(2);
       }
     }
@@ -81,7 +81,7 @@ class DatabaseHandler
       }
       catch(Exception e)
       {
-        System.out.println("Could not create file.");
+        System.out.println("[!] Could not create file.");
       }
     }
 

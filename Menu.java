@@ -27,7 +27,8 @@ class Menu
           // System.out.println("a");
           break;
         case "e":
-          System.out.println("e");
+          bankOperations.deleteClient();
+          //System.out.println("e");
           break;
         case "d":
           System.out.println("d");

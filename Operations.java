@@ -2,6 +2,7 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import java.util.NoSuchElementException;
 
 class Operations
 {
@@ -52,7 +53,7 @@ class Operations
       temporaryLastName = input.nextLine();
       while((!Pattern.matches("[a-zA-Z]+", temporaryLastName)) || temporaryLastName.length() > 21)
       {
-        System.out.println("Error: incorrect input. Last name can contains only letters up to 21 characters.");
+        System.out.println("[!] Error: incorrect input. Last name can contains only letters up to 21 characters.");
         System.out.print("Last name: ");
         temporaryLastName = input.nextLine();
       }
@@ -61,7 +62,7 @@ class Operations
       temporaryPesel = input.nextLine();
       while((!Pattern.matches("\\d{11}", temporaryPesel)))
       {
-        System.out.println("Error: incorrect input. Pesel must be 11 digit long.");
+        System.out.println("[!] Error: incorrect input. Pesel must be 11 digit long.");
         System.out.print("Pesel: ");
         temporaryPesel = input.nextLine();
       }
@@ -70,7 +71,7 @@ class Operations
       temporaryAddress = input.nextLine();
       while((!Pattern.matches("[a-zA-Z0-9 -]+", temporaryAddress)) || temporaryAddress.length() > 27)
       {
-        System.out.println("Error: incorrect input. Address can not be longet than 27 characters.");
+        System.out.println("[!] Error: incorrect input. Address can not be longet than 27 characters.");
         System.out.print("Address: ");
         temporaryAddress = input.nextLine();
       }
@@ -81,14 +82,7 @@ class Operations
       System.out.println("Address: " + temporaryAddress);
       System.out.print("\nDo you wish to add this client? [Y/n] ");
 
-      choice = input.nextLine();
-
-      while(!choice.equals("Y") && !choice.equals("y") && !choice.equals("") && !choice.equals("N") && !choice.equals("n"))
-      {
-        System.out.print("Do you wish to add this client? [Y/n] ");
-        choice = input.next();
-      }
-
+      choice = comfirmPromt("Do you wish to add this client?");
       if(choice.equals("n") || choice.equals("N"))
       {
         System.out.println("\nClient " + temporaryFirstName + " " + temporaryLastName + " has NOT been added.");
@@ -103,9 +97,65 @@ class Operations
         }
         catch(Exception e)
         {
-          System.out.println("An error ocured while adding user - " + e.getMessage());
+          System.out.println("[!] An error ocured while adding user - " + e.getMessage());
         }
       }
+
+  }
+
+  public void deleteClient()
+  {
+    int temporaryId;
+    final int userToBeDeletedId;
+    String userInputId;
+    String choice;
+    Client temporaryClient = null;
+    System.out.print("Provide user ID: ");
+    userInputId = input.nextLine();
+
+    while(true)
+    {
+      try
+      {
+        temporaryId = Integer.parseInt(userInputId);
+        break;
+      }
+      catch (NumberFormatException nfe)
+      {
+        System.out.println("[!] Error: wrong input. ID must be a natural number.");
+      }
+
+      System.out.print("Provide user ID: ");
+      userInputId = input.nextLine();
+
+    }
+
+    try
+    {
+      userToBeDeletedId = temporaryId;
+      temporaryClient = accounts.stream().filter(client -> client.getId() == userToBeDeletedId).findFirst().get();
+      System.out.println(temporaryClient);
+
+      choice = comfirmPromt("Do you wish to delete this client?");
+
+      if(choice.equals("n") || choice.equals("N"))
+      {
+        System.out.println("\nClient " + temporaryClient.getFirstName() + " " + temporaryClient.getLastName() + " has NOT been deleted.");
+      }
+      else
+      {
+        accounts.remove(accounts.indexOf(temporaryClient));
+        System.out.println("Client has been deleted.");
+      }
+    }
+    catch(NoSuchElementException nsee)
+    {
+      System.out.println("[!] Could not find user with ID " + temporaryId);
+    }
+    catch(NullPointerException npe)
+    {
+      System.out.println("[!] Could not find user with ID " + temporaryId);
+    }
 
   }
 
@@ -121,6 +171,19 @@ class Operations
       System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
     }
     );
+  }
+
+  private String comfirmPromt(String messageToBeShow)
+  {
+    String choice;
+    System.out.print(messageToBeShow + " [y/n] ");
+    choice = input.nextLine();
+    while(!choice.equals("Y") && !choice.equals("y") && !choice.equals("N") && !choice.equals("n"))
+    {
+      System.out.print(messageToBeShow + " [y/n] ");
+      choice = input.nextLine();
+    }
+    return choice;
   }
 
 }
