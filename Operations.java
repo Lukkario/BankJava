@@ -38,6 +38,10 @@ class Operations
       {
         temporaryId = 1;
       }
+      catch(IndexOutOfBoundsException e)
+      {
+        temporaryId = 1;
+      }
 
 
       System.out.print("First name: ");
