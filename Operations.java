@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.NoSuchElementException;
 import java.text.DecimalFormat;
+import java.util.stream.Collectors;
 
 class Operations
 {
@@ -109,425 +110,575 @@ class Operations
 
   }
 
-  public void deleteClient()
-  {
-    int temporaryId;
-    final int userToBeDeletedId;
-    String userInputId;
-    String choice;
-    Client temporaryClient = null;
-    System.out.print("Provide user ID: ");
-    userInputId = input.nextLine();
-
-    while(true)
+    public void deleteClient()
     {
-      try
-      {
-        temporaryId = Integer.parseInt(userInputId);
-        break;
-      }
-      catch (NumberFormatException nfe)
-      {
-        System.out.println("[!] Error: wrong input. ID must be a natural number.");
-      }
-
+      int temporaryId;
+      final int userToBeDeletedId;
+      String userInputId;
+      String choice;
+      Client temporaryClient = null;
       System.out.print("Provide user ID: ");
       userInputId = input.nextLine();
 
+      while(true)
+      {
+        try
+        {
+          temporaryId = Integer.parseInt(userInputId);
+          break;
+        }
+        catch (NumberFormatException nfe)
+        {
+          System.out.println("[!] Error: wrong input. ID must be a natural number.");
+        }
+
+        System.out.print("Provide user ID: ");
+        userInputId = input.nextLine();
+
+      }
+
+      try
+      {
+        userToBeDeletedId = temporaryId;
+        temporaryClient = accounts.stream().filter(client -> client.getId() == userToBeDeletedId).findFirst().get();
+        System.out.println(temporaryClient);
+
+        choice = comfirmPromt("Do you wish to delete this client?");
+
+        if(choice.equals("n") || choice.equals("N"))
+        {
+          System.out.println("\nClient " + temporaryClient.getFirstName() + " " + temporaryClient.getLastName() + " has NOT been deleted.");
+        }
+        else
+        {
+          accounts.remove(accounts.indexOf(temporaryClient));
+          System.out.println("Client has been deleted.");
+        }
+      }
+      catch(NoSuchElementException nsee)
+      {
+        System.out.println("[!] Could not find user with ID " + temporaryId);
+      }
+      catch(NullPointerException npe)
+      {
+        System.out.println("[!] Could not find user with ID " + temporaryId);
+      }
+
+    }
+
+    public void depositMoney()
+    {
+      String userInputId;
+      String moenyToBeDeposit;
+      String choice;
+      Client clientToBeMoneyDeposit;
+      final int userId;
+      double balanceToBeAdded = 0.0;
+
+
+      System.out.print("Insert user ID: ");
+      userInputId = input.nextLine();
+      while((!Pattern.matches("[0-9]+", userInputId)))
+      {
+        System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+        System.out.print("Insert user ID: ");
+        userInputId = input.nextLine();
+      }
+
+      try
+      {
+        userId = Integer.parseInt(userInputId);
+
+        try
+        {
+          clientToBeMoneyDeposit = accounts.stream().filter(client -> client.getId() == userId).findFirst().get();
+
+          while(true)
+          {
+            try
+            {
+              System.out.print("Insert ammount of money to be deposit: ");
+              moenyToBeDeposit = input.nextLine();
+              //System.out.println(moenyToBeDeposit.substring(0,1));
+              if(moenyToBeDeposit.equals("") || moenyToBeDeposit.substring(0,1).equals("-"))
+              {
+                System.out.println("[!] Error: incorrect input.");
+              }
+              else
+              {
+                balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
+                moenyToBeDeposit = balanceFormat.format(balanceToBeAdded);
+                balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
+                break;
+              }
+            }
+            catch(NumberFormatException nfe)
+            {
+              System.out.println("[!] Error: incorrect input.");
+              System.out.print("Insert ammount of money to be deposit: ");
+            }
+          }
+
+          System.out.println("Money to be deposited to "+ clientToBeMoneyDeposit.getFirstName() +" "+ clientToBeMoneyDeposit.getLastName() +": " +balanceToBeAdded);
+          choice = comfirmPromt("Do you wish to delete deposit?");
+
+          if(choice.equals("n") || choice.equals("N"))
+          {
+            System.out.println("Deposit has been terminated.");
+          }
+          else
+          {
+            clientToBeMoneyDeposit.setBalance(clientToBeMoneyDeposit.getBalance() + balanceToBeAdded);
+            database.saveDatabase();
+            System.out.println("Money has been deposited.");
+          }
+        }
+        catch(NoSuchElementException nsee)
+        {
+          System.out.println("[!] Could not find user with ID " + userInputId);
+        }
+        catch(NullPointerException npe)
+        {
+          System.out.println("[!] Could not find user with ID " + userInputId);
+        }
+        catch(Exception e)
+        {
+          System.out.println("[!] An error occured while depoting money.");
+        }
+
+      }
+      catch (NumberFormatException nfe)
+      {
+        System.out.println("[!] Error: could not parse intput.");
+      }
+
+    }
+
+    public void withdrawMoney()
+    {
+      String userInputId;
+      String moenyToBeDeposit;
+      String choice;
+      Client clientToBeMoneyDeposit;
+      final int userId;
+      double balanceToBeAdded = 0.0;
+
+
+      System.out.print("Insert user ID: ");
+      userInputId = input.nextLine();
+      while((!Pattern.matches("[0-9]+", userInputId)))
+      {
+        System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+        System.out.print("Insert user ID: ");
+        userInputId = input.nextLine();
+      }
+
+      try
+      {
+        userId = Integer.parseInt(userInputId);
+
+        try
+        {
+          clientToBeMoneyDeposit = accounts.stream().filter(client -> client.getId() == userId).findFirst().get();
+
+          while(true)
+          {
+            try
+            {
+              System.out.print("Insert ammount of money to be withdraw: ");
+              moenyToBeDeposit = input.nextLine();
+              //System.out.println(moenyToBeDeposit.substring(0,1));
+              if(moenyToBeDeposit.equals("") || moenyToBeDeposit.substring(0,1).equals("-"))
+              {
+                System.out.println("[!] Error: incorrect input.");
+              }
+              else
+              {
+                balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
+                moenyToBeDeposit = balanceFormat.format(balanceToBeAdded);
+                balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
+                break;
+              }
+            }
+            catch(NumberFormatException nfe)
+            {
+              System.out.println("[!] Error: incorrect input.");
+              System.out.print("Insert ammount of money to be deposit: ");
+            }
+          }
+
+          System.out.println("Money to be withdraw to "+ clientToBeMoneyDeposit.getFirstName() +" "+ clientToBeMoneyDeposit.getLastName() +": " +balanceToBeAdded);
+          choice = comfirmPromt("Do you wish to  deposit?");
+
+          if(choice.equals("n") || choice.equals("N"))
+          {
+            System.out.println("Withdraw has been terminated.");
+          }
+          else
+          {
+            clientToBeMoneyDeposit.setBalance(clientToBeMoneyDeposit.getBalance() - balanceToBeAdded);
+            database.saveDatabase();
+            System.out.println("Money has been withdrawed.");
+          }
+        }
+        catch(NoSuchElementException nsee)
+        {
+          System.out.println("[!] Could not find user with ID " + userInputId);
+        }
+        catch(NullPointerException npe)
+        {
+          System.out.println("[!] Could not find user with ID " + userInputId);
+        }
+        catch(Exception e)
+        {
+          System.out.println("[!] An error occured while withdrawing money.");
+        }
+
+      }
+      catch (NumberFormatException nfe)
+      {
+        System.out.println("[!] Error: could not parse intput.");
+      }
+
+    }
+
+
+    public void transferMoney()
+    {
+      String userIdFromWhomWillTransferGo = "";
+      String userIdToWhomWillTransferGo = "";
+      String moneyToTransferd;
+      String choice;
+      Client clientFromWhomWillTransferGo;
+      Client clientToWhomWillTransferGo;
+      final int userId1;
+      final int userId2;
+      double balanceChange = 0.0;
+
+
+      System.out.print("Insert user ID from whom will transfer be made: ");
+      userIdFromWhomWillTransferGo = input.nextLine();
+      while((!Pattern.matches("[0-9]+", userIdFromWhomWillTransferGo)))
+      {
+        System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+        System.out.print("Insert user ID from whom will transfer be made: ");
+        userIdFromWhomWillTransferGo = input.nextLine();
+      }
+
+      System.out.print("Insert user ID to whom will transfer be made: ");
+      userIdToWhomWillTransferGo = input.nextLine();
+      while((!Pattern.matches("[0-9]+", userIdToWhomWillTransferGo)))
+      {
+        System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+        System.out.print("Insert user ID to whom will transfer be made: ");
+        userIdToWhomWillTransferGo = input.nextLine();
+      }
+
+      try
+      {
+        userId1 = Integer.parseInt(userIdFromWhomWillTransferGo);
+        userId2 = Integer.parseInt(userIdToWhomWillTransferGo);
+
+        try
+        {
+          try
+          {
+            clientFromWhomWillTransferGo = accounts.stream().filter(client -> client.getId() == userId1).findFirst().get();
+          }
+          catch(NoSuchElementException nsee)
+          {
+            System.out.println("[!] Could not find user with ID " + userIdFromWhomWillTransferGo);
+            return;
+          }
+
+          try
+          {
+            clientToWhomWillTransferGo = accounts.stream().filter(client -> client.getId() == userId2).findFirst().get();
+          }
+          catch(NoSuchElementException nsee)
+          {
+            System.out.println("[!] Could not find user with ID " + userIdToWhomWillTransferGo);
+            return;
+          }
+
+          while(true)
+          {
+            try
+            {
+              System.out.print("Insert ammount of money to be transferd: ");
+              moneyToTransferd = input.nextLine();
+              if(moneyToTransferd.equals("") || moneyToTransferd.substring(0,1).equals("-"))
+              {
+                System.out.println("[!] Error: incorrect input.");
+              }
+              else
+              {
+                balanceChange = Double.parseDouble(moneyToTransferd.replace(",", "."));
+                moneyToTransferd = balanceFormat.format(balanceChange);
+                balanceChange = Double.parseDouble(moneyToTransferd.replace(",", "."));
+                break;
+              }
+            }
+            catch(NumberFormatException nfe)
+            {
+              System.out.println("[!] Error: incorrect input.");
+              System.out.print("Insert ammount of money to be deposit: ");
+            }
+          }
+
+          System.out.println("Money to be transfer " +balanceChange+ " from "+ clientFromWhomWillTransferGo.getFirstName() +" "+ clientFromWhomWillTransferGo.getLastName() +" to " +clientToWhomWillTransferGo.getFirstName() +" "+ clientToWhomWillTransferGo.getLastName());
+          choice = comfirmPromt("Do you wish to  deposit?");
+
+          if(choice.equals("n") || choice.equals("N"))
+          {
+            System.out.println("Transfer has been terminated.");
+          }
+          else
+          {
+            clientToWhomWillTransferGo.setBalance(clientToWhomWillTransferGo.getBalance() + balanceChange);
+            clientFromWhomWillTransferGo.setBalance(clientFromWhomWillTransferGo.getBalance() - balanceChange);
+            database.saveDatabase();
+            System.out.println("Money has been transfered.");
+          }
+        }
+        catch(NoSuchElementException nsee)
+        {
+          System.out.println("[!] Could not find user.");
+        }
+        catch(NullPointerException npe)
+        {
+          System.out.println("[!] Could not find user.");
+        }
+        catch(Exception e)
+        {
+          System.out.println("[!] An error occured while transfering money.");
+        }
+
+      }
+      catch (NumberFormatException nfe)
+      {
+        System.out.println("[!] Error: could not parse intput.");
+      }
+
+    }
+
+    public void showSpecificClients()
+    {
+      String choice = choicePromt("> ");
+
+      switch (choice) {
+        case "I":
+          showClientById();
+          break;
+        case "F":
+          showByFirstName();
+          break;
+        case "L":
+          showByLastName();
+          break;
+        case "P":
+          showByPesel();
+          break;
+        case "A":
+
+          break;
+        default:
+          break;
+        }
+    }
+
+  private void showClientById()
+  {
+    String userToBeShownById;
+    final int userId;
+    Client accountDetails;
+
+    System.out.print("Insert user ID: ");
+    userToBeShownById = input.nextLine();
+    while((!Pattern.matches("[0-9]+", userToBeShownById)))
+    {
+      System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+      System.out.print("Insert user ID: ");
+      userToBeShownById = input.nextLine();
     }
 
     try
     {
-      userToBeDeletedId = temporaryId;
-      temporaryClient = accounts.stream().filter(client -> client.getId() == userToBeDeletedId).findFirst().get();
-      System.out.println(temporaryClient);
+      userId = Integer.parseInt(userToBeShownById);
+      accountDetails =  accounts.stream().filter(client -> client.getId() == userId).findFirst().get();
+      printHeader();
+      System.out.format(leftAlignFormat, accountDetails.getId(), accountDetails.getFirstName(), accountDetails.getLastName(), accountDetails.getPesel(), accountDetails.getAddress(), accountDetails.getBalance());
+      System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
 
-      choice = comfirmPromt("Do you wish to delete this client?");
+    }
+    catch(NumberFormatException nfe)
+    {
+      System.out.println("[!] Incorrect ID.");
+    }
+    catch(NoSuchElementException nsee)
+    {
+      System.out.println("[!] Could not find user.");
+    }
+    catch(NullPointerException npe)
+    {
+      System.out.println("[!] Could not find user.");
+    }
+    catch(Exception e)
+    {
+      System.out.println("[!] An error occured while receiving data.");
+    }
 
-      if(choice.equals("n") || choice.equals("N"))
+  }
+
+  private void showByFirstName()
+  {
+    String userToBeShownByFirstName;
+    List<Client> filterdAccounts = new ArrayList<Client>();
+    final String pattern;
+
+    System.out.print("Insert user first name: ");
+    userToBeShownByFirstName = input.nextLine();
+    while((!Pattern.matches("[a-zA-Z]+", userToBeShownByFirstName)))
+    {
+      System.out.println("[!] Error: incorrect input. First name can contain only letters.");
+      System.out.print("Insert user first name: ");
+      userToBeShownByFirstName = input.nextLine();
+    }
+
+    pattern = userToBeShownByFirstName;
+
+    try
+    {
+      filterdAccounts = accounts.stream().filter(client -> client.getFirstName().equals(pattern)).collect(Collectors.toList());
+      if(filterdAccounts.size() != 0)
       {
-        System.out.println("\nClient " + temporaryClient.getFirstName() + " " + temporaryClient.getLastName() + " has NOT been deleted.");
+        printHeader();
+        filterdAccounts.forEach(client ->
+        {
+          System.out.format(leftAlignFormat, client.getId(), client.getFirstName(), client.getLastName(), client.getPesel(), client.getAddress(), client.getBalance());
+          System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
+        }
+        );
       }
       else
       {
-        accounts.remove(accounts.indexOf(temporaryClient));
-        System.out.println("Client has been deleted.");
+          System.out.println("[!] Could not find any user with first name " + pattern);
       }
     }
     catch(NoSuchElementException nsee)
     {
-      System.out.println("[!] Could not find user with ID " + temporaryId);
+      System.out.println("[!] Could not find user.");
     }
     catch(NullPointerException npe)
     {
-      System.out.println("[!] Could not find user with ID " + temporaryId);
+      System.out.println("[!] Could not find user.");
+    }
+    catch(Exception e)
+    {
+      System.out.println("[!] An error occured while receiving data.");
     }
 
   }
 
-  public void depositMoney()
+  private void showByLastName()
   {
-    String userInputId;
-    String moenyToBeDeposit;
-    String choice;
-    Client clientToBeMoneyDeposit;
-    final int userId;
-    double balanceToBeAdded = 0.0;
+    String userToBeShownByLastName;
+    List<Client> filterdAccounts = new ArrayList<Client>();
+    final String pattern;
 
-
-    System.out.print("Insert user ID: ");
-    userInputId = input.nextLine();
-    while((!Pattern.matches("[0-9]+", userInputId)))
+    System.out.print("Insert user last name: ");
+    userToBeShownByLastName = input.nextLine();
+    while((!Pattern.matches("[a-zA-Z]+", userToBeShownByLastName)))
     {
-      System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
-      System.out.print("Insert user ID: ");
-      userInputId = input.nextLine();
+      System.out.println("[!] Error: incorrect input. Last name can contain only letters.");
+      System.out.print("Insert user first name: ");
+      userToBeShownByLastName = input.nextLine();
     }
+
+    pattern = userToBeShownByLastName;
 
     try
     {
-      userId = Integer.parseInt(userInputId);
-
-      try
+      filterdAccounts = accounts.stream().filter(client -> client.getLastName().equals(pattern)).collect(Collectors.toList());
+      if(filterdAccounts.size() != 0)
       {
-        clientToBeMoneyDeposit = accounts.stream().filter(client -> client.getId() == userId).findFirst().get();
-
-        while(true)
+        printHeader();
+        filterdAccounts.forEach(client ->
         {
-          try
-          {
-            System.out.print("Insert ammount of money to be deposit: ");
-            moenyToBeDeposit = input.nextLine();
-            //System.out.println(moenyToBeDeposit.substring(0,1));
-            if(moenyToBeDeposit.equals("") || moenyToBeDeposit.substring(0,1).equals("-"))
-            {
-              System.out.println("[!] Error: incorrect input.");
-            }
-            else
-            {
-              balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
-              moenyToBeDeposit = balanceFormat.format(balanceToBeAdded);
-              balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
-              break;
-            }
-          }
-          catch(NumberFormatException nfe)
-          {
-            System.out.println("[!] Error: incorrect input.");
-            System.out.print("Insert ammount of money to be deposit: ");
-          }
+          System.out.format(leftAlignFormat, client.getId(), client.getFirstName(), client.getLastName(), client.getPesel(), client.getAddress(), client.getBalance());
+          System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
         }
-
-        System.out.println("Money to be deposited to "+ clientToBeMoneyDeposit.getFirstName() +" "+ clientToBeMoneyDeposit.getLastName() +": " +balanceToBeAdded);
-        choice = comfirmPromt("Do you wish to delete deposit?");
-
-        if(choice.equals("n") || choice.equals("N"))
-        {
-          System.out.println("Deposit has been terminated.");
-        }
-        else
-        {
-          clientToBeMoneyDeposit.setBalance(clientToBeMoneyDeposit.getBalance() + balanceToBeAdded);
-          database.saveDatabase();
-          System.out.println("Money has been deposited.");
-        }
+        );
       }
-      catch(NoSuchElementException nsee)
+      else
       {
-        System.out.println("[!] Could not find user with ID " + userInputId);
+          System.out.println("[!] Could not find any user with last name " + pattern);
       }
-      catch(NullPointerException npe)
-      {
-        System.out.println("[!] Could not find user with ID " + userInputId);
-      }
-      catch(Exception e)
-      {
-        System.out.println("[!] An error occured while depoting money.");
-      }
-
     }
-    catch (NumberFormatException nfe)
+    catch(NoSuchElementException nsee)
     {
-      System.out.println("[!] Error: could not parse intput.");
+      System.out.println("[!] Could not find user.");
+    }
+    catch(NullPointerException npe)
+    {
+      System.out.println("[!] Could not find user.");
+    }
+    catch(Exception e)
+    {
+      System.out.println("[!] An error occured while receiving data.");
     }
 
   }
 
-  public void withdrawMoney()
+  private void showByPesel()
   {
-    String userInputId;
-    String moenyToBeDeposit;
-    String choice;
-    Client clientToBeMoneyDeposit;
-    final int userId;
-    double balanceToBeAdded = 0.0;
+    String userToBeShownByPesel;
+    List<Client> filterdAccounts = new ArrayList<Client>();
+    final String pattern;
 
-
-    System.out.print("Insert user ID: ");
-    userInputId = input.nextLine();
-    while((!Pattern.matches("[0-9]+", userInputId)))
+    System.out.print("Insert user pesel: ");
+    userToBeShownByPesel = input.nextLine();
+    while((!Pattern.matches("\\d{11}", userToBeShownByPesel)))
     {
-      System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
-      System.out.print("Insert user ID: ");
-      userInputId = input.nextLine();
+      System.out.println("[!] Error: incorrect input. Pesel name can contain only 11 numbers.");
+      System.out.print("Insert user pesel: ");
+      userToBeShownByPesel = input.nextLine();
     }
+
+    pattern = userToBeShownByPesel;
 
     try
     {
-      userId = Integer.parseInt(userInputId);
-
-      try
+      filterdAccounts = accounts.stream().filter(client -> client.getPesel().equals(pattern)).collect(Collectors.toList());
+      if(filterdAccounts.size() != 0)
       {
-        clientToBeMoneyDeposit = accounts.stream().filter(client -> client.getId() == userId).findFirst().get();
-
-        while(true)
+        printHeader();
+        filterdAccounts.forEach(client ->
         {
-          try
-          {
-            System.out.print("Insert ammount of money to be withdraw: ");
-            moenyToBeDeposit = input.nextLine();
-            //System.out.println(moenyToBeDeposit.substring(0,1));
-            if(moenyToBeDeposit.equals("") || moenyToBeDeposit.substring(0,1).equals("-"))
-            {
-              System.out.println("[!] Error: incorrect input.");
-            }
-            else
-            {
-              balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
-              moenyToBeDeposit = balanceFormat.format(balanceToBeAdded);
-              balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
-              break;
-            }
-          }
-          catch(NumberFormatException nfe)
-          {
-            System.out.println("[!] Error: incorrect input.");
-            System.out.print("Insert ammount of money to be deposit: ");
-          }
+          System.out.format(leftAlignFormat, client.getId(), client.getFirstName(), client.getLastName(), client.getPesel(), client.getAddress(), client.getBalance());
+          System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
         }
-
-        System.out.println("Money to be withdraw to "+ clientToBeMoneyDeposit.getFirstName() +" "+ clientToBeMoneyDeposit.getLastName() +": " +balanceToBeAdded);
-        choice = comfirmPromt("Do you wish to  deposit?");
-
-        if(choice.equals("n") || choice.equals("N"))
-        {
-          System.out.println("Withdraw has been terminated.");
-        }
-        else
-        {
-          clientToBeMoneyDeposit.setBalance(clientToBeMoneyDeposit.getBalance() - balanceToBeAdded);
-          database.saveDatabase();
-          System.out.println("Money has been withdrawed.");
-        }
+        );
       }
-      catch(NoSuchElementException nsee)
+      else
       {
-        System.out.println("[!] Could not find user with ID " + userInputId);
+          System.out.println("[!] Could not find any user with first name " + pattern);
       }
-      catch(NullPointerException npe)
-      {
-        System.out.println("[!] Could not find user with ID " + userInputId);
-      }
-      catch(Exception e)
-      {
-        System.out.println("[!] An error occured while withdrawing money.");
-      }
-
     }
-    catch (NumberFormatException nfe)
+    catch(NoSuchElementException nsee)
     {
-      System.out.println("[!] Error: could not parse intput.");
+      System.out.println("[!] Could not find user.");
     }
-
-  }
-
-
-  public void transferMoney()
-  {
-    String userIdFromWhomWillTransferGo = "";
-    String userIdToWhomWillTransferGo = "";
-    String moneyToTransferd;
-    String choice;
-    Client clientFromWhomWillTransferGo;
-    Client clientToWhomWillTransferGo;
-    final int userId1;
-    final int userId2;
-    double balanceChange = 0.0;
-
-
-    System.out.print("Insert user ID from whom will transfer be made: ");
-    userIdFromWhomWillTransferGo = input.nextLine();
-    while((!Pattern.matches("[0-9]+", userIdFromWhomWillTransferGo)))
+    catch(NullPointerException npe)
     {
-      System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
-      System.out.print("Insert user ID from whom will transfer be made: ");
-      userIdFromWhomWillTransferGo = input.nextLine();
+      System.out.println("[!] Could not find user.");
     }
-
-    System.out.print("Insert user ID to whom will transfer be made: ");
-    userIdToWhomWillTransferGo = input.nextLine();
-    while((!Pattern.matches("[0-9]+", userIdToWhomWillTransferGo)))
+    catch(Exception e)
     {
-      System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
-      System.out.print("Insert user ID to whom will transfer be made: ");
-      userIdToWhomWillTransferGo = input.nextLine();
-    }
-
-    try
-    {
-      userId1 = Integer.parseInt(userIdFromWhomWillTransferGo);
-      userId2 = Integer.parseInt(userIdToWhomWillTransferGo);
-
-      try
-      {
-        try
-        {
-          clientFromWhomWillTransferGo = accounts.stream().filter(client -> client.getId() == userId1).findFirst().get();
-        }
-        catch(NoSuchElementException nsee)
-        {
-          System.out.println("[!] Could not find user with ID " + userIdFromWhomWillTransferGo);
-          return;
-        }
-
-        try
-        {
-          clientToWhomWillTransferGo = accounts.stream().filter(client -> client.getId() == userId2).findFirst().get();
-        }
-        catch(NoSuchElementException nsee)
-        {
-          System.out.println("[!] Could not find user with ID " + userIdToWhomWillTransferGo);
-          return;
-        }
-
-        while(true)
-        {
-          try
-          {
-            System.out.print("Insert ammount of money to be transferd: ");
-            moneyToTransferd = input.nextLine();
-            if(moneyToTransferd.equals("") || moneyToTransferd.substring(0,1).equals("-"))
-            {
-              System.out.println("[!] Error: incorrect input.");
-            }
-            else
-            {
-              balanceChange = Double.parseDouble(moneyToTransferd.replace(",", "."));
-              moneyToTransferd = balanceFormat.format(balanceChange);
-              balanceChange = Double.parseDouble(moneyToTransferd.replace(",", "."));
-              break;
-            }
-          }
-          catch(NumberFormatException nfe)
-          {
-            System.out.println("[!] Error: incorrect input.");
-            System.out.print("Insert ammount of money to be deposit: ");
-          }
-        }
-
-        System.out.println("Money to be transfer " +balanceChange+ " from "+ clientFromWhomWillTransferGo.getFirstName() +" "+ clientFromWhomWillTransferGo.getLastName() +" to " +clientToWhomWillTransferGo.getFirstName() +" "+ clientToWhomWillTransferGo.getLastName());
-        choice = comfirmPromt("Do you wish to  deposit?");
-
-        if(choice.equals("n") || choice.equals("N"))
-        {
-          System.out.println("Transfer has been terminated.");
-        }
-        else
-        {
-          clientToWhomWillTransferGo.setBalance(clientToWhomWillTransferGo.getBalance() + balanceChange);
-          clientFromWhomWillTransferGo.setBalance(clientFromWhomWillTransferGo.getBalance() - balanceChange);
-          database.saveDatabase();
-          System.out.println("Money has been transfered.");
-        }
-      }
-      catch(NoSuchElementException nsee)
-      {
-        System.out.println("[!] Could not find user.");
-      }
-      catch(NullPointerException npe)
-      {
-        System.out.println("[!] Could not find user.");
-      }
-      catch(Exception e)
-      {
-        System.out.println("[!] An error occured while transfering money.");
-      }
-
-    }
-    catch (NumberFormatException nfe)
-    {
-      System.out.println("[!] Error: could not parse intput.");
+      System.out.println("[!] An error occured while receiving data.");
     }
 
   }
-
-  public void showSpecificClients()
-  {
-    String choice = choicePromt("> ");
-
-    switch (choice) {
-      case "I":
-        showClientById();
-        break;
-      case "F":
-
-        break;
-      case "L":
-
-        break;
-      case "P":
-
-        break;
-      case "A":
-
-        break;
-      default:
-        break;
-      }
-  }
-
-private void showClientById()
-{
-  String userToBeShownById;
-  final int userId;
-  Client accountDetails;
-
-  System.out.print("Insert user ID: ");
-  userToBeShownById = input.nextLine();
-  while((!Pattern.matches("[0-9]+", userToBeShownById)))
-  {
-    System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
-    System.out.print("Insert user ID: ");
-    userToBeShownById = input.nextLine();
-  }
-
-  try
-  {
-    userId = Integer.parseInt(userToBeShownById);
-    accountDetails =  accounts.stream().filter(client -> client.getId() == userId).findFirst().get();
-    printHeader();
-    System.out.format(leftAlignFormat, accountDetails.getId(), accountDetails.getFirstName(), accountDetails.getLastName(), accountDetails.getPesel(), accountDetails.getAddress(), accountDetails.getBalance());
-    System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
-
-  }
-  catch(NumberFormatException nfe)
-  {
-    System.out.println("[!] Incorrect ID.");
-  }
-  catch(NoSuchElementException nsee)
-  {
-    System.out.println("[!] Could not find user.");
-  }
-  catch(NullPointerException npe)
-  {
-    System.out.println("[!] Could not find user.");
-  }
-  catch(Exception e)
-  {
-    System.out.println("[!] An error occured while receiving data.");
-  }
-
-}
   //---------------------------------------------------------------------------------------------------------------------------------------------
 
   public void showClients()
