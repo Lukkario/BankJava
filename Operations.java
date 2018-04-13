@@ -3,12 +3,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.NoSuchElementException;
+import java.text.DecimalFormat;
 
 class Operations
 {
   DatabaseHandler database = null;
   List<Client> accounts = null;
   Scanner input = null;
+  DecimalFormat balanceFormat = new DecimalFormat("#.##");
 
   Operations(DatabaseHandler databaseHandler, List<Client> clients, Scanner userInput)
   {
@@ -73,7 +75,7 @@ class Operations
 
       System.out.print("Address: ");
       temporaryAddress = input.nextLine();
-      while((!Pattern.matches("[a-zA-Z0-9 -]+", temporaryAddress)) || temporaryAddress.length() > 27)
+      while((!Pattern.matches("[a-zA-Z0-9\\/\\\\. -]+", temporaryAddress)) || temporaryAddress.length() > 27)
       {
         System.out.println("[!] Error: incorrect input. Address can not be longet than 27 characters.");
         System.out.print("Address: ");
@@ -84,7 +86,6 @@ class Operations
       System.out.println("Last name: " + temporaryLastName);
       System.out.println("Pesel: " + temporaryPesel);
       System.out.println("Address: " + temporaryAddress);
-      System.out.print("\nDo you wish to add this client? [Y/n] ");
 
       choice = comfirmPromt("Do you wish to add this client?");
       if(choice.equals("n") || choice.equals("N"))
@@ -162,6 +163,96 @@ class Operations
     }
 
   }
+
+  void depositMoney()
+  {
+    String userInputId;
+    String moenyToBeDeposit;
+    String choice;
+    Client clientToBeMoneyDeposit;
+    final int userId;
+    double balanceToBeAdded = 0.0;
+
+
+    System.out.print("Insert user ID: ");
+    userInputId = input.nextLine();
+    while((!Pattern.matches("[0-9]+", userInputId)))
+    {
+      System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+      System.out.print("Insert user ID: ");
+      userInputId = input.nextLine();
+    }
+
+    try
+    {
+      userId = Integer.parseInt(userInputId);
+
+      try
+      {
+        clientToBeMoneyDeposit = accounts.stream().filter(client -> client.getId() == userId).findFirst().get();
+
+        while(true)
+        {
+          try
+          {
+            System.out.print("Insert ammount of money to be deposit: ");
+            moenyToBeDeposit = input.nextLine();
+            //System.out.println(moenyToBeDeposit.substring(0,1));
+            if(moenyToBeDeposit.equals("") || moenyToBeDeposit.substring(0,1).equals("-"))
+            {
+              System.out.println("[!] Error: incorrect input.");
+            }
+            else
+            {
+              balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
+              moenyToBeDeposit = balanceFormat.format(balanceToBeAdded);
+              balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
+              break;
+            }
+          }
+          catch(NumberFormatException nfe)
+          {
+            System.out.println("[!] Error: incorrect input.");
+            System.out.print("Insert ammount of money to be deposit: ");
+          }
+        }
+
+        System.out.println("Money to be teposited to "+ clientToBeMoneyDeposit.getFirstName() +" "+ clientToBeMoneyDeposit.getLastName() +": " +balanceToBeAdded);
+        choice = comfirmPromt("Do you wish to delete deposit?");
+
+        if(choice.equals("n") || choice.equals("N"))
+        {
+          System.out.println("Deposit has been terminated.");
+        }
+        else
+        {
+          clientToBeMoneyDeposit.setBalance(clientToBeMoneyDeposit.getBalance() + balanceToBeAdded);
+          database.saveDatabase();
+          System.out.println("Money has been deposited.");
+        }
+      }
+      catch(NoSuchElementException nsee)
+      {
+        System.out.println("[!] Could not find user with ID " + userInputId);
+      }
+      catch(NullPointerException npe)
+      {
+        System.out.println("[!] Could not find user with ID " + userInputId);
+      }
+      catch(Exception e)
+      {
+        System.out.println("[!] An error occured while depoting money.");
+      }
+
+    }
+    catch (NumberFormatException nfe)
+    {
+      System.out.println("[!] Error: could not parse intput.");
+    }
+
+  }
+
+  //---------------------------------------------------------------------------------------------------------------------------------------------
 
   public void showClients()
   {

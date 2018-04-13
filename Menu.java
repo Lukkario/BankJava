@@ -31,7 +31,8 @@ class Menu
           //System.out.println("e");
           break;
         case "d":
-          System.out.println("d");
+          bankOperations.depositMoney();
+          //System.out.println("d");
           break;
         case "w":
           System.out.println("w");
