@@ -68,11 +68,11 @@ class Menu
   private void printMenu()
   {
     System.out.println("a - [a]dds account to database");
-    System.out.println("e - d[e]letes account from database");
     System.out.println("d - [d]eposit money");
     System.out.println("w - [w]ithdraw money");
     System.out.println("t - [t]ransfer moeny between accounts");
     System.out.println("s - [s]hows details of all accounts");
+    System.out.println("e - d[e]letes account from database");
     System.out.println("p - shows details of s[p]ecific accounts");
     System.out.println("h - shows [h]elp menu");
     System.out.println("q - [q]uits program");
