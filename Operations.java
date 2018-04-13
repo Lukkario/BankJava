@@ -217,7 +217,7 @@ class Operations
           }
         }
 
-        System.out.println("Money to be teposited to "+ clientToBeMoneyDeposit.getFirstName() +" "+ clientToBeMoneyDeposit.getLastName() +": " +balanceToBeAdded);
+        System.out.println("Money to be deposited to "+ clientToBeMoneyDeposit.getFirstName() +" "+ clientToBeMoneyDeposit.getLastName() +": " +balanceToBeAdded);
         choice = comfirmPromt("Do you wish to delete deposit?");
 
         if(choice.equals("n") || choice.equals("N"))
@@ -242,6 +242,94 @@ class Operations
       catch(Exception e)
       {
         System.out.println("[!] An error occured while depoting money.");
+      }
+
+    }
+    catch (NumberFormatException nfe)
+    {
+      System.out.println("[!] Error: could not parse intput.");
+    }
+
+  }
+
+  void withdrawMoney()
+  {
+    String userInputId;
+    String moenyToBeDeposit;
+    String choice;
+    Client clientToBeMoneyDeposit;
+    final int userId;
+    double balanceToBeAdded = 0.0;
+
+
+    System.out.print("Insert user ID: ");
+    userInputId = input.nextLine();
+    while((!Pattern.matches("[0-9]+", userInputId)))
+    {
+      System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+      System.out.print("Insert user ID: ");
+      userInputId = input.nextLine();
+    }
+
+    try
+    {
+      userId = Integer.parseInt(userInputId);
+
+      try
+      {
+        clientToBeMoneyDeposit = accounts.stream().filter(client -> client.getId() == userId).findFirst().get();
+
+        while(true)
+        {
+          try
+          {
+            System.out.print("Insert ammount of money to be withdraw: ");
+            moenyToBeDeposit = input.nextLine();
+            //System.out.println(moenyToBeDeposit.substring(0,1));
+            if(moenyToBeDeposit.equals("") || moenyToBeDeposit.substring(0,1).equals("-"))
+            {
+              System.out.println("[!] Error: incorrect input.");
+            }
+            else
+            {
+              balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
+              moenyToBeDeposit = balanceFormat.format(balanceToBeAdded);
+              balanceToBeAdded = Double.parseDouble(moenyToBeDeposit.replace(",", "."));
+              break;
+            }
+          }
+          catch(NumberFormatException nfe)
+          {
+            System.out.println("[!] Error: incorrect input.");
+            System.out.print("Insert ammount of money to be deposit: ");
+          }
+        }
+
+        System.out.println("Money to be withdraw to "+ clientToBeMoneyDeposit.getFirstName() +" "+ clientToBeMoneyDeposit.getLastName() +": " +balanceToBeAdded);
+        choice = comfirmPromt("Do you wish to  deposit?");
+
+        if(choice.equals("n") || choice.equals("N"))
+        {
+          System.out.println("Withdraw has been terminated.");
+        }
+        else
+        {
+          clientToBeMoneyDeposit.setBalance(clientToBeMoneyDeposit.getBalance() - balanceToBeAdded);
+          database.saveDatabase();
+          System.out.println("Money has been withdrawed.");
+        }
+      }
+      catch(NoSuchElementException nsee)
+      {
+        System.out.println("[!] Could not find user with ID " + userInputId);
+      }
+      catch(NullPointerException npe)
+      {
+        System.out.println("[!] Could not find user with ID " + userInputId);
+      }
+      catch(Exception e)
+      {
+        System.out.println("[!] An error occured while withdrawing money.");
       }
 
     }

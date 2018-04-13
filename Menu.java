@@ -35,7 +35,8 @@ class Menu
           //System.out.println("d");
           break;
         case "w":
-          System.out.println("w");
+          bankOperations.withdrawMoney();
+          //System.out.println("w");
           break;
         case "t":
           System.out.println("t");
