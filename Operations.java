@@ -7,10 +7,11 @@ import java.text.DecimalFormat;
 
 class Operations
 {
-  DatabaseHandler database = null;
-  List<Client> accounts = null;
-  Scanner input = null;
-  DecimalFormat balanceFormat = new DecimalFormat("#.##");
+  private DatabaseHandler database = null;
+  private List<Client> accounts = null;
+  private Scanner input = null;
+  private DecimalFormat balanceFormat = new DecimalFormat("#.##");
+  private String leftAlignFormat = "| %-6d | %-10s | %-21s | %-11s | %-27s | %-25.2f |%n";
 
   Operations(DatabaseHandler databaseHandler, List<Client> clients, Scanner userInput)
   {
@@ -164,7 +165,7 @@ class Operations
 
   }
 
-  void depositMoney()
+  public void depositMoney()
   {
     String userInputId;
     String moenyToBeDeposit;
@@ -252,7 +253,7 @@ class Operations
 
   }
 
-  void withdrawMoney()
+  public void withdrawMoney()
   {
     String userInputId;
     String moenyToBeDeposit;
@@ -341,7 +342,7 @@ class Operations
   }
 
 
-  void transferMoney()
+  public void transferMoney()
   {
     String userIdFromWhomWillTransferGo = "";
     String userIdToWhomWillTransferGo = "";
@@ -460,21 +461,91 @@ class Operations
 
   }
 
+  public void showSpecificClients()
+  {
+    String choice = choicePromt("> ");
 
+    switch (choice) {
+      case "I":
+        showClientById();
+        break;
+      case "F":
+
+        break;
+      case "L":
+
+        break;
+      case "P":
+
+        break;
+      case "A":
+
+        break;
+      default:
+        break;
+      }
+  }
+
+private void showClientById()
+{
+  String userToBeShownById;
+  final int userId;
+  Client accountDetails;
+
+  System.out.print("Insert user ID: ");
+  userToBeShownById = input.nextLine();
+  while((!Pattern.matches("[0-9]+", userToBeShownById)))
+  {
+    System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+    System.out.print("Insert user ID: ");
+    userToBeShownById = input.nextLine();
+  }
+
+  try
+  {
+    userId = Integer.parseInt(userToBeShownById);
+    accountDetails =  accounts.stream().filter(client -> client.getId() == userId).findFirst().get();
+    printHeader();
+    System.out.format(leftAlignFormat, accountDetails.getId(), accountDetails.getFirstName(), accountDetails.getLastName(), accountDetails.getPesel(), accountDetails.getAddress(), accountDetails.getBalance());
+    System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
+
+  }
+  catch(NumberFormatException nfe)
+  {
+    System.out.println("[!] Incorrect ID.");
+  }
+  catch(NoSuchElementException nsee)
+  {
+    System.out.println("[!] Could not find user.");
+  }
+  catch(NullPointerException npe)
+  {
+    System.out.println("[!] Could not find user.");
+  }
+  catch(Exception e)
+  {
+    System.out.println("[!] An error occured while receiving data.");
+  }
+
+}
   //---------------------------------------------------------------------------------------------------------------------------------------------
 
   public void showClients()
   {
-    String leftAlignFormat = "| %-6d | %-10s | %-21s | %-11s | %-27s | %-25.2f |%n";
-    System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
-    System.out.format("|   ID   | First Name |       Last Name       |    Pesel    |           Address           |          Balance          |%n");
-    System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
+    printHeader();
     accounts.forEach(client ->
     {
       System.out.format(leftAlignFormat, client.getId(), client.getFirstName(), client.getLastName(), client.getPesel(), client.getAddress(), client.getBalance());
       System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
     }
     );
+  }
+
+  private void printHeader()
+  {
+    System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
+    System.out.format("|   ID   | First Name |       Last Name       |    Pesel    |           Address           |          Balance          |%n");
+    System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
   }
 
   private String comfirmPromt(String messageToBeShow)
@@ -485,6 +556,20 @@ class Operations
     while(!choice.equals("Y") && !choice.equals("y") && !choice.equals("N") && !choice.equals("n"))
     {
       System.out.print(messageToBeShow + " [y/n] ");
+      choice = input.nextLine();
+    }
+    return choice;
+  }
+
+  private String choicePromt(String messageToBeShow)
+  {
+    String choice;
+    System.out.print(messageToBeShow);
+    choice = input.nextLine();
+    while(!choice.equals("I") && !choice.equals("F") && !choice.equals("L") && !choice.equals("P") && !choice.equals("A"))
+    {
+      System.out.println("[!] Incorrect option.");
+      System.out.print(messageToBeShow);
       choice = input.nextLine();
     }
     return choice;

@@ -47,7 +47,9 @@ class Menu
           bankOperations.showClients();
           break;
         case "p":
-          System.out.println("p");
+          printSubMenu();
+          bankOperations.showSpecificClients();
+          //System.out.println("p");
           break;
         case "h":
           printMenu();
@@ -74,5 +76,14 @@ class Menu
     System.out.println("p - shows details of s[p]ecific accounts");
     System.out.println("h - shows [h]elp menu");
     System.out.println("q - [q]uits program");
+  }
+
+  private void printSubMenu()
+  {
+    System.out.println("I - [I]D");
+    System.out.println("F - [F]irst name");
+    System.out.println("L - [L]ast name");
+    System.out.println("P - [P]esel");
+    System.out.println("A - [A]ddress");
   }
 }
