@@ -39,7 +39,8 @@ class Menu
           //System.out.println("w");
           break;
         case "t":
-          System.out.println("t");
+          bankOperations.transferMoney();
+          //System.out.println("t");
           break;
         case "s":
           // System.out.println("s");

@@ -340,6 +340,127 @@ class Operations
 
   }
 
+
+  void transferMoney()
+  {
+    String userIdFromWhomWillTransferGo = "";
+    String userIdToWhomWillTransferGo = "";
+    String moneyToTransferd;
+    String choice;
+    Client clientFromWhomWillTransferGo;
+    Client clientToWhomWillTransferGo;
+    final int userId1;
+    final int userId2;
+    double balanceChange = 0.0;
+
+
+    System.out.print("Insert user ID from whom will transfer be made: ");
+    userIdFromWhomWillTransferGo = input.nextLine();
+    while((!Pattern.matches("[0-9]+", userIdFromWhomWillTransferGo)))
+    {
+      System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+      System.out.print("Insert user ID from whom will transfer be made: ");
+      userIdFromWhomWillTransferGo = input.nextLine();
+    }
+
+    System.out.print("Insert user ID to whom will transfer be made: ");
+    userIdToWhomWillTransferGo = input.nextLine();
+    while((!Pattern.matches("[0-9]+", userIdToWhomWillTransferGo)))
+    {
+      System.out.println("[!] Error: incorrect input. ID can contain only natural numbers.");
+      System.out.print("Insert user ID to whom will transfer be made: ");
+      userIdToWhomWillTransferGo = input.nextLine();
+    }
+
+    try
+    {
+      userId1 = Integer.parseInt(userIdFromWhomWillTransferGo);
+      userId2 = Integer.parseInt(userIdToWhomWillTransferGo);
+
+      try
+      {
+        try
+        {
+          clientFromWhomWillTransferGo = accounts.stream().filter(client -> client.getId() == userId1).findFirst().get();
+        }
+        catch(NoSuchElementException nsee)
+        {
+          System.out.println("[!] Could not find user with ID " + userIdFromWhomWillTransferGo);
+          return;
+        }
+
+        try
+        {
+          clientToWhomWillTransferGo = accounts.stream().filter(client -> client.getId() == userId2).findFirst().get();
+        }
+        catch(NoSuchElementException nsee)
+        {
+          System.out.println("[!] Could not find user with ID " + userIdToWhomWillTransferGo);
+          return;
+        }
+
+        while(true)
+        {
+          try
+          {
+            System.out.print("Insert ammount of money to be transferd: ");
+            moneyToTransferd = input.nextLine();
+            if(moneyToTransferd.equals("") || moneyToTransferd.substring(0,1).equals("-"))
+            {
+              System.out.println("[!] Error: incorrect input.");
+            }
+            else
+            {
+              balanceChange = Double.parseDouble(moneyToTransferd.replace(",", "."));
+              moneyToTransferd = balanceFormat.format(balanceChange);
+              balanceChange = Double.parseDouble(moneyToTransferd.replace(",", "."));
+              break;
+            }
+          }
+          catch(NumberFormatException nfe)
+          {
+            System.out.println("[!] Error: incorrect input.");
+            System.out.print("Insert ammount of money to be deposit: ");
+          }
+        }
+
+        System.out.println("Money to be transfer " +balanceChange+ " from "+ clientFromWhomWillTransferGo.getFirstName() +" "+ clientFromWhomWillTransferGo.getLastName() +" to " +clientToWhomWillTransferGo.getFirstName() +" "+ clientToWhomWillTransferGo.getLastName());
+        choice = comfirmPromt("Do you wish to  deposit?");
+
+        if(choice.equals("n") || choice.equals("N"))
+        {
+          System.out.println("Transfer has been terminated.");
+        }
+        else
+        {
+          clientToWhomWillTransferGo.setBalance(clientToWhomWillTransferGo.getBalance() + balanceChange);
+          clientFromWhomWillTransferGo.setBalance(clientFromWhomWillTransferGo.getBalance() - balanceChange);
+          database.saveDatabase();
+          System.out.println("Money has been transfered.");
+        }
+      }
+      catch(NoSuchElementException nsee)
+      {
+        System.out.println("[!] Could not find user.");
+      }
+      catch(NullPointerException npe)
+      {
+        System.out.println("[!] Could not find user.");
+      }
+      catch(Exception e)
+      {
+        System.out.println("[!] An error occured while transfering money.");
+      }
+
+    }
+    catch (NumberFormatException nfe)
+    {
+      System.out.println("[!] Error: could not parse intput.");
+    }
+
+  }
+
+
   //---------------------------------------------------------------------------------------------------------------------------------------------
 
   public void showClients()
