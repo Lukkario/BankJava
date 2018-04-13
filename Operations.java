@@ -480,7 +480,7 @@ class Operations
           showByPesel();
           break;
         case "A":
-
+          showByAddress();
           break;
         default:
           break;
@@ -662,7 +662,57 @@ class Operations
       }
       else
       {
-          System.out.println("[!] Could not find any user with first name " + pattern);
+          System.out.println("[!] Could not find any user with pesel " + pattern);
+      }
+    }
+    catch(NoSuchElementException nsee)
+    {
+      System.out.println("[!] Could not find user.");
+    }
+    catch(NullPointerException npe)
+    {
+      System.out.println("[!] Could not find user.");
+    }
+    catch(Exception e)
+    {
+      System.out.println("[!] An error occured while receiving data.");
+    }
+
+  }
+
+  private void showByAddress()
+  {
+    String userToBeShownByAddress;
+    List<Client> filterdAccounts = new ArrayList<Client>();
+    final String pattern;
+
+    System.out.print("Insert user address: ");
+    userToBeShownByAddress = input.nextLine();
+    while((!Pattern.matches("[a-zA-Z0-9\\/\\\\. -]+", userToBeShownByAddress)))
+    {
+      System.out.println("[!] Error: incorrect input. Address name can contain only letters, numbers, dots, slashes, backslashes and dashes.");
+      System.out.print("Insert user addres: ");
+      userToBeShownByAddress = input.nextLine();
+    }
+
+    pattern = userToBeShownByAddress;
+
+    try
+    {
+      filterdAccounts = accounts.stream().filter(client -> client.getAddress().equals(pattern)).collect(Collectors.toList());
+      if(filterdAccounts.size() != 0)
+      {
+        printHeader();
+        filterdAccounts.forEach(client ->
+        {
+          System.out.format(leftAlignFormat, client.getId(), client.getFirstName(), client.getLastName(), client.getPesel(), client.getAddress(), client.getBalance());
+          System.out.format("+--------+------------+-----------------------+-------------+-----------------------------+---------------------------+%n");
+        }
+        );
+      }
+      else
+      {
+          System.out.println("[!] Could not find any user with address " + pattern);
       }
     }
     catch(NoSuchElementException nsee)
