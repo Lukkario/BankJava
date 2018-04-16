@@ -422,8 +422,13 @@ class Operations
             catch(NumberFormatException nfe)
             {
               System.out.println("[!] Error: incorrect input.");
-              System.out.print("Insert ammount of money to be deposit: ");
             }
+          }
+
+          if(clientFromWhomWillTransferGo.getBalance() - balanceChange < 0.0d)
+          {
+            System.out.println("[!] Client " + clientFromWhomWillTransferGo.getFirstName() + " " + clientFromWhomWillTransferGo.getLastName() + " has not enough money.");
+            return;
           }
 
           System.out.println("Money to be transfer " +balanceChange+ " from "+ clientFromWhomWillTransferGo.getFirstName() +" "+ clientFromWhomWillTransferGo.getLastName() +" to " +clientToWhomWillTransferGo.getFirstName() +" "+ clientToWhomWillTransferGo.getLastName());
@@ -464,7 +469,7 @@ class Operations
 
     public void showSpecificClients()
     {
-      String choice = choicePromt("> ");
+      String choice = choicePromt("# ");
 
       switch (choice) {
         case "I":
